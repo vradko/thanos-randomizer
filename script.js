@@ -95,9 +95,8 @@ function addToRoster() {
 }
 
 function clearAll() {
+  // Clear only the active roster — leave the textarea (and its persisted copy) intact.
   names = [];
-  nameInput.value = '';
-  saveStoredText('');
   render();
 }
 
