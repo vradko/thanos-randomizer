@@ -539,6 +539,114 @@ input[type="range"]#duration::-moz-range-thumb {
   border-radius: 8px;
 }
 
+/* ───────── Add / summon overlay (gauntlet) ───────── */
+#add-overlay {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.4rem;
+  z-index: 220;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.55) 0%, rgba(0,0,0,0.92) 75%);
+  animation: overlayFade .4s ease-out;
+  backdrop-filter: blur(4px);
+}
+
+.gauntlet-frame {
+  position: relative;
+  padding: 4px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ffe9a8 0%, #ffd96b 30%, #d4af37 60%, #8a6a17 100%);
+  background-size: 250% 250%;
+  box-shadow:
+    0 0 60px rgba(255, 215, 0, 0.55),
+    0 0 140px rgba(212, 175, 55, 0.35);
+  animation: gauntletPop .55s cubic-bezier(.2,.9,.3,1.15), gauntletGlow 3s ease infinite .55s;
+}
+
+#gauntlet-gif {
+  display: block;
+  max-width: min(62vw, 560px);
+  max-height: 60vh;
+  border-radius: 10px;
+}
+
+.summon-caption {
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: clamp(0.78rem, 2vw, 1.2rem);
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: #ffe9a8;
+  text-align: center;
+  max-width: 90vw;
+  padding: 0 1rem;
+  text-shadow:
+    0 0 14px rgba(255, 215, 0, 0.75),
+    0 0 32px rgba(212, 175, 55, 0.55);
+  animation: summonCaption 4.7s ease-out forwards;
+}
+
+@keyframes gauntletPop {
+  0%   { transform: scale(0.55); opacity: 0; filter: blur(10px) brightness(2); }
+  60%  { transform: scale(1.06); opacity: 1; filter: blur(0) brightness(1.25); }
+  100% { transform: scale(1);    opacity: 1; filter: blur(0) brightness(1); }
+}
+
+@keyframes summonCaption {
+  0%   { opacity: 0; letter-spacing: 0.18em; }
+  12%  { opacity: 1; letter-spacing: 0.42em; }
+  55%  { opacity: 0.78; letter-spacing: 0.42em; }
+  78%  { opacity: 1;    letter-spacing: 0.46em; }
+  100% { opacity: 0.9;  letter-spacing: 0.42em; }
+}
+
+/* ───────── Lightning storm (gold) ───────── */
+.lightning-storm {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  pointer-events: none;
+  z-index: 240;
+  overflow: visible;
+}
+
+.lightning-bolt {
+  fill: none;
+  stroke: #fffbe6;
+  stroke-width: 2.4;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+  filter:
+    drop-shadow(0 0 4px #ffe9a8)
+    drop-shadow(0 0 10px #ffd96b)
+    drop-shadow(0 0 22px #d4af37)
+    drop-shadow(0 0 38px rgba(255, 215, 0, 0.75));
+  stroke-dasharray: 4200;
+  stroke-dashoffset: 4200;
+  opacity: 0;
+  animation: lightningStrike 850ms cubic-bezier(.32, .04, .68, 1) forwards;
+}
+
+.lightning-bolt.thick {
+  stroke-width: 3.6;
+  stroke: #ffe9a8;
+}
+
+@keyframes lightningStrike {
+  0%   { stroke-dashoffset: 4200; opacity: 0; }
+  8%   { opacity: 1; }
+  18%  { opacity: 0.4; }
+  28%  { opacity: 1; }
+  55%  { stroke-dashoffset: 0; opacity: 1; }
+  72%  { opacity: 0.85; }
+  100% { stroke-dashoffset: -4200; opacity: 0; }
+}
+
 /* ───────── Green flash ───────── */
 #flash-overlay {
   position: fixed;

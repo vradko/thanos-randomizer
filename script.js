@@ -12,6 +12,8 @@ const snapBtn     = $('snap-btn');
 const countLabel  = $('count');
 const gifOverlay  = $('gif-overlay');
 const snapGif     = $('snap-gif');
+const addOverlay  = $('add-overlay');
+const gauntletGif = $('gauntlet-gif');
 const flashLayer  = $('flash-overlay');
 const winnerFrame = $('winner-image-frame');
 const durationSlider = $('duration');
@@ -101,15 +103,27 @@ function addToRoster() {
   }
   // Replace the roster with whatever is in the textarea (deduped, preserves order).
   const seen = new Set();
-  names = [];
+  const next = [];
   for (const n of parsed) {
     const key = n.toLowerCase();
     if (seen.has(key)) continue;
     seen.add(key);
-    names.push(n);
-    if (names.length >= 60) break; // sanity cap
+    next.push(n);
+    if (next.length >= 60) break; // sanity cap
   }
-  render();
+
+  const prev = new Set(names.map(s => s.toLowerCase()));
+  const hasNewArrivals = next.some(n => !prev.has(n.toLowerCase()));
+
+  if (hasNewArrivals && !snapping) {
+    summonGauntlet(() => {
+      names = next;
+      render();
+    });
+  } else {
+    names = next;
+    render();
+  }
 }
 
 function clearAll() {
@@ -403,6 +417,104 @@ function computeSurvivorScale(rect) {
   const scaleW = targetW / rect.width;
   const scaleH = targetH / rect.height;
   return Math.max(1.7, Math.min(scaleW, scaleH, 4.0));
+}
+
+/* ───────── Gauntlet summoning (on add) ───────── */
+// thanos-last-stone.gif is ~5040ms long. We want the dramatic build-up to play out
+// across most of its runtime, with lightning sustained throughout, and the roster
+// appearing on the climactic beat near the end.
+const SUMMON_TOTAL_MS    = 4800;
+const SUMMON_PEAK_MS     = 3400; // when chips render behind the overlay
+const SUMMON_WAVES_MS    = [0, 1500, 2900]; // lightning storm waves
+
+function summonGauntlet(onPeak) {
+  // Reset gif playback so it always starts from frame 0
+  const src = gauntletGif.getAttribute('src');
+  gauntletGif.setAttribute('src', '');
+  void gauntletGif.offsetWidth;
+  gauntletGif.setAttribute('src', src);
+
+  addOverlay.classList.remove('hidden');
+
+  // Layered lightning storms across the full overlay window
+  SUMMON_WAVES_MS.forEach(t => setTimeout(runLightningStorm, t));
+
+  // Update the roster on the climactic beat
+  setTimeout(() => { try { onPeak && onPeak(); } catch (_) {} }, SUMMON_PEAK_MS);
+  setTimeout(() => addOverlay.classList.add('hidden'), SUMMON_TOTAL_MS);
+}
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+function runLightningStorm() {
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+
+  const svg = document.createElementNS(SVG_NS, 'svg');
+  svg.setAttribute('class', 'lightning-storm');
+  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+  svg.setAttribute('preserveAspectRatio', 'none');
+
+  const N = 14;
+  for (let i = 0; i < N; i++) {
+    const bolt = createLightningBolt(W, H, i, N);
+    svg.appendChild(bolt);
+  }
+  document.body.appendChild(svg);
+  setTimeout(() => svg.remove(), 1900);
+}
+
+function createLightningBolt(W, H, index, total) {
+  const g = document.createElementNS(SVG_NS, 'g');
+
+  const fromLeft = Math.random() < 0.5;
+  const startX = fromLeft ? -80 : W + 80;
+  const endX   = fromLeft ?  W + 80 : -80;
+  const startY = Math.random() * H;
+  const endY   = startY + (Math.random() - 0.5) * H * 0.55;
+
+  const segments = 22 + Math.floor(Math.random() * 10);
+  const points = [];
+  const dx = endX - startX;
+  const dy = endY - startY;
+  for (let s = 0; s <= segments; s++) {
+    const t = s / segments;
+    const x = startX + dx * t + (Math.random() - 0.5) * 28;
+    const y = startY + dy * t + (Math.random() - 0.5) * 80;
+    points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+  }
+
+  const main = document.createElementNS(SVG_NS, 'polyline');
+  main.setAttribute('points', points.join(' '));
+  main.setAttribute('class', index % 3 === 0 ? 'lightning-bolt thick' : 'lightning-bolt');
+  const delay = (index / total) * 650 + Math.random() * 220;
+  main.style.animationDelay = `${delay}ms`;
+  g.appendChild(main);
+
+  // Optional branch off a midpoint
+  if (Math.random() < 0.55) {
+    const branchStart = Math.floor(segments * (0.35 + Math.random() * 0.4));
+    const [bx0Str, by0Str] = points[branchStart].split(',');
+    const bx0 = parseFloat(bx0Str);
+    const by0 = parseFloat(by0Str);
+    const branchPts = [`${bx0.toFixed(1)},${by0.toFixed(1)}`];
+    const bsteps = 6 + Math.floor(Math.random() * 5);
+    const dirX = (fromLeft ? 1 : -1) * (60 + Math.random() * 120);
+    const dirY = (Math.random() - 0.5) * 220;
+    for (let s = 1; s <= bsteps; s++) {
+      const t = s / bsteps;
+      const x = bx0 + dirX * t + (Math.random() - 0.5) * 22;
+      const y = by0 + dirY * t + (Math.random() - 0.5) * 28;
+      branchPts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
+    }
+    const branch = document.createElementNS(SVG_NS, 'polyline');
+    branch.setAttribute('points', branchPts.join(' '));
+    branch.setAttribute('class', 'lightning-bolt');
+    branch.style.animationDelay = `${delay + 80}ms`;
+    g.appendChild(branch);
+  }
+
+  return g;
 }
 
 /* ───────── Initial render ───────── */
