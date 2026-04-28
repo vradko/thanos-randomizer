@@ -159,12 +159,12 @@ async function startSnap() {
 
   chips.forEach((chip, i) => {
     if (i === survivorIdx) return;
-    const startDelay = Math.random() * 1500;
+    const startDelay = Math.random() * 5000;
     setTimeout(() => disintegrate(chip), startDelay);
   });
 
-  // Wait for disintegration window + tail
-  await sleep(1500 + 600);
+  // Wait for the full 5s disintegration window + particle tail
+  await sleep(5000 + 800);
   document.body.classList.remove('snapping');
 
   // Fade out the editing UI so the survivor stands alone on the cosmos.
