@@ -14,10 +14,28 @@ const gifOverlay  = $('gif-overlay');
 const snapGif     = $('snap-gif');
 const flashLayer  = $('flash-overlay');
 const winnerFrame = $('winner-image-frame');
+const durationSlider = $('duration');
+const durationValue  = $('duration-value');
 const canvas      = $('particle-canvas');
 const ctx         = canvas.getContext('2d', { alpha: true });
 
 const STORAGE_KEY = 'thesnap.textarea';
+const DURATION_KEY = 'thesnap.duration';
+
+/* ───────── Duration slider ───────── */
+const storedDur = parseFloat(localStorage.getItem(DURATION_KEY));
+if (!isNaN(storedDur) && storedDur >= 2 && storedDur <= 14) {
+  durationSlider.value = storedDur;
+}
+function updateDurationLabel() {
+  const v = parseFloat(durationSlider.value);
+  durationValue.textContent = `${v.toFixed(1)}s`;
+}
+updateDurationLabel();
+durationSlider.addEventListener('input', () => {
+  updateDurationLabel();
+  try { localStorage.setItem(DURATION_KEY, durationSlider.value); } catch (_) {}
+});
 
 /* ───────── Canvas sizing ───────── */
 const DPR = Math.min(window.devicePixelRatio || 1, 2);
@@ -157,14 +175,15 @@ async function startSnap() {
   const chips = [...namesGrid.querySelectorAll('.name-chip')];
   const survivorChip = chips[survivorIdx];
 
+  const windowMs = parseFloat(durationSlider.value) * 1000;
   chips.forEach((chip, i) => {
     if (i === survivorIdx) return;
-    const startDelay = Math.random() * 5000;
+    const startDelay = Math.random() * windowMs;
     setTimeout(() => disintegrate(chip), startDelay);
   });
 
-  // Wait for the full 5s disintegration window + particle tail
-  await sleep(5000 + 800);
+  // Wait for the full disintegration window + particle tail
+  await sleep(windowMs + 800);
   document.body.classList.remove('snapping');
 
   // Fade out the editing UI so the survivor stands alone on the cosmos.

@@ -291,6 +291,91 @@ main {
 }
 .name-chip.survivor .remove { display: none; }
 
+/* ───────── Duration slider ───────── */
+.duration-zone {
+  max-width: 480px;
+  margin: 1.2rem auto 0.5rem;
+  padding: 1rem 1.4rem 1.2rem;
+  background: rgba(10, 8, 22, 0.45);
+  border: 1px solid rgba(212, 175, 55, 0.22);
+  border-radius: 12px;
+  backdrop-filter: blur(6px);
+}
+.duration-zone label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.74rem;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  margin-bottom: 0.7rem;
+  color: rgba(244, 238, 224, 0.55);
+}
+#duration-value {
+  font-family: 'Cinzel', serif;
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--gold-bright);
+  text-shadow: 0 0 14px rgba(255, 215, 0, 0.5);
+  min-width: 3.6rem;
+  text-align: right;
+}
+input[type="range"]#duration {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 6px;
+  background: linear-gradient(90deg,
+    rgba(45, 212, 255, 0.4) 0%,
+    rgba(212, 175, 55, 0.55) 50%,
+    rgba(214, 43, 61, 0.55) 100%);
+  border-radius: 4px;
+  outline: none;
+  cursor: pointer;
+  box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.55);
+}
+input[type="range"]#duration::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffe9a8, #d4af37 60%, #8a6a17);
+  border: 2px solid rgba(255, 251, 230, 0.85);
+  box-shadow:
+    0 0 14px rgba(255, 217, 107, 0.7),
+    0 0 0 4px rgba(212, 175, 55, 0.18);
+  cursor: grab;
+  transition: transform .18s ease-out, box-shadow .18s ease-out;
+}
+input[type="range"]#duration::-webkit-slider-thumb:hover {
+  transform: scale(1.18);
+  box-shadow:
+    0 0 22px rgba(255, 217, 107, 0.85),
+    0 0 0 6px rgba(212, 175, 55, 0.28);
+}
+input[type="range"]#duration::-webkit-slider-thumb:active { cursor: grabbing; }
+input[type="range"]#duration::-moz-range-thumb {
+  width: 22px;
+  height: 22px;
+  border: 2px solid rgba(255, 251, 230, 0.85);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffe9a8, #d4af37 60%, #8a6a17);
+  box-shadow: 0 0 14px rgba(255, 217, 107, 0.7);
+  cursor: grab;
+}
+.duration-marks {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 0.55rem;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.6rem;
+  letter-spacing: 0.22em;
+  color: rgba(244, 238, 224, 0.32);
+}
+
 /* ───────── Snap button ───────── */
 .action-zone {
   display: flex;
