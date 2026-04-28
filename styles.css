@@ -1,0 +1,550 @@
+/* ───────── Reset & Base ───────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --gold: #d4af37;
+  --gold-bright: #ffd96b;
+  --soul: #ff7849;
+  --reality: #d62b3d;
+  --power: #b53cff;
+  --mind: #ffd200;
+  --time: #4ade80;
+  --space: #2dd4ff;
+  --ink: #050410;
+}
+
+html, body { min-height: 100%; }
+
+body {
+  font-family: 'Cinzel', 'Times New Roman', serif;
+  background: radial-gradient(ellipse at 50% -10%, #2a0a3e 0%, #0a0420 35%, #03020a 70%, #000 100%);
+  color: #f4eee0;
+  overflow-x: hidden;
+  min-height: 100vh;
+  position: relative;
+}
+
+/* ───────── Cosmic background ───────── */
+.cosmos {
+  position: fixed;
+  inset: -50%;
+  background-image:
+    radial-gradient(1.5px 1.5px at 12% 22%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 28% 64%, #fff 0%, transparent 100%),
+    radial-gradient(2px 2px at 44% 18%, #ffe9a8 0%, transparent 100%),
+    radial-gradient(1px 1px at 60% 52%, #fff 0%, transparent 100%),
+    radial-gradient(1.5px 1.5px at 72% 80%, #c8b6ff 0%, transparent 100%),
+    radial-gradient(1px 1px at 86% 35%, #fff 0%, transparent 100%),
+    radial-gradient(1px 1px at 92% 70%, #fff 0%, transparent 100%),
+    radial-gradient(2px 2px at 6% 80%, #ffd2ff 0%, transparent 100%);
+  background-size: 600px 600px;
+  background-repeat: repeat;
+  pointer-events: none;
+  z-index: -2;
+  animation: drift 180s linear infinite;
+  opacity: 0.7;
+}
+@keyframes drift { to { transform: translate(-300px, -300px); } }
+
+.nebula {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 10%, rgba(180, 60, 255, 0.18), transparent 40%),
+    radial-gradient(circle at 80% 30%, rgba(214, 43, 61, 0.14), transparent 45%),
+    radial-gradient(circle at 50% 90%, rgba(45, 212, 255, 0.10), transparent 50%);
+  pointer-events: none;
+  z-index: -1;
+  animation: pulse 16s ease-in-out infinite alternate;
+}
+@keyframes pulse { from { opacity: 0.7; } to { opacity: 1; } }
+
+/* ───────── Hero ───────── */
+.hero {
+  text-align: center;
+  padding: 5rem 1.5rem 1rem;
+}
+
+.title {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: clamp(3rem, 9vw, 6.5rem);
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-transform: uppercase;
+  background: linear-gradient(120deg,
+    var(--mind) 0%,
+    var(--soul) 22%,
+    var(--reality) 44%,
+    var(--power) 66%,
+    var(--space) 84%,
+    var(--time) 100%);
+  background-size: 280% 100%;
+  -webkit-background-clip: text;
+          background-clip: text;
+  color: transparent;
+  filter: drop-shadow(0 0 18px rgba(255, 215, 0, 0.25))
+          drop-shadow(0 0 38px rgba(180, 60, 255, 0.18));
+  animation: titleShift 12s ease-in-out infinite;
+}
+@keyframes titleShift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+.subtitle {
+  margin-top: 1.2rem;
+  font-family: 'Orbitron', sans-serif;
+  font-weight: 500;
+  font-size: clamp(0.75rem, 1.4vw, 0.95rem);
+  letter-spacing: 0.32em;
+  color: rgba(244, 238, 224, 0.55);
+  text-transform: uppercase;
+}
+
+/* ───────── Main layout ───────── */
+main {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+.input-zone {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+  margin: 2rem auto 1rem;
+  max-width: 560px;
+}
+
+#name-input {
+  width: 100%;
+  min-height: 140px;
+  padding: 1rem 1.3rem;
+  background: rgba(10, 8, 22, 0.65);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 10px;
+  color: #fffbe6;
+  font-family: 'Cinzel', serif;
+  font-size: 1rem;
+  line-height: 1.55;
+  letter-spacing: 0.05em;
+  outline: none;
+  resize: vertical;
+  backdrop-filter: blur(6px);
+  transition: border-color .25s, box-shadow .25s;
+}
+#name-input::placeholder {
+  color: rgba(244, 238, 224, 0.28);
+  font-style: italic;
+  letter-spacing: 0.04em;
+}
+#name-input:focus {
+  border-color: var(--gold-bright);
+  box-shadow: 0 0 0 1px rgba(255, 217, 107, 0.4),
+              0 0 28px rgba(255, 217, 107, 0.22);
+}
+
+.input-actions {
+  display: flex;
+  justify-content: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+#add-btn {
+  padding: 0.85rem 1.8rem;
+  background: linear-gradient(135deg, #d4af37 0%, #ffd96b 50%, #b8860b 100%);
+  border: none;
+  border-radius: 10px;
+  color: #1a0e00;
+  font-family: 'Cinzel', serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s, filter .2s;
+}
+#add-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(255, 215, 0, 0.25);
+  filter: brightness(1.1);
+}
+#add-btn:active { transform: translateY(0); }
+
+.ghost {
+  padding: 0.85rem 1.4rem;
+  background: transparent;
+  border: 1px solid rgba(214, 43, 61, 0.4);
+  border-radius: 10px;
+  color: rgba(255, 150, 150, 0.85);
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.78rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all .25s;
+}
+.ghost:hover {
+  border-color: rgba(214, 43, 61, 0.85);
+  color: #ffb1b1;
+  box-shadow: 0 0 18px rgba(214, 43, 61, 0.3);
+}
+
+/* Counter */
+.counter {
+  text-align: center;
+  font-family: 'Orbitron', sans-serif;
+  letter-spacing: 0.3em;
+  font-size: 0.78rem;
+  color: rgba(244, 238, 224, 0.45);
+  text-transform: uppercase;
+  margin-bottom: 1.5rem;
+}
+#count {
+  color: var(--gold-bright);
+  font-weight: 800;
+  font-size: 1.4rem;
+  margin-right: 0.7rem;
+  vertical-align: -2px;
+  text-shadow: 0 0 18px rgba(255, 215, 0, 0.45);
+}
+
+/* ───────── Names grid ───────── */
+.names-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.8rem;
+  justify-content: center;
+  align-items: center;
+  min-height: 80px;
+  padding: 1.5rem 0.5rem;
+  margin-bottom: 2rem;
+}
+
+.name-chip {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.75rem 1.2rem;
+  background:
+    linear-gradient(135deg,
+      rgba(80, 28, 130, 0.55) 0%,
+      rgba(35, 14, 65, 0.65) 50%,
+      rgba(150, 30, 60, 0.45) 100%);
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 8px;
+  color: #fffbe6;
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 1.02rem;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(6px);
+  box-shadow:
+    0 0 22px rgba(180, 60, 255, 0.22),
+    inset 0 0 10px rgba(255, 217, 107, 0.10);
+  animation: chipIn .55s cubic-bezier(.2,.9,.3,1.15);
+  transition: transform .25s, box-shadow .25s;
+}
+.name-chip:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    0 0 30px rgba(255, 215, 0, 0.35),
+    inset 0 0 12px rgba(255, 217, 107, 0.18);
+}
+@keyframes chipIn {
+  from { transform: scale(.6) translateY(10px); opacity: 0; filter: blur(6px); }
+  to   { transform: scale(1) translateY(0);     opacity: 1; filter: blur(0); }
+}
+.name-chip .label { white-space: nowrap; }
+.name-chip .remove {
+  display: inline-flex; align-items: center; justify-content: center;
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(214, 43, 61, 0.25);
+  color: #ffb1b1;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background .2s, transform .2s;
+}
+.name-chip .remove:hover {
+  background: rgba(214, 43, 61, 0.7);
+  color: #fff;
+  transform: rotate(90deg);
+}
+
+/* Surviving chip — final epic state */
+.name-chip.survivor {
+  background:
+    linear-gradient(135deg,
+      rgba(255, 215, 0, 0.22) 0%,
+      rgba(180, 60, 255, 0.18) 50%,
+      rgba(45, 212, 255, 0.18) 100%);
+  border: 2px solid var(--gold-bright);
+  box-shadow:
+    0 0 50px rgba(255, 215, 0, 0.55),
+    0 0 120px rgba(180, 60, 255, 0.4),
+    inset 0 0 20px rgba(255, 217, 107, 0.25);
+  letter-spacing: 0.18em;
+}
+.name-chip.survivor .remove { display: none; }
+
+/* ───────── Snap button ───────── */
+.action-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin: 2rem 0 1rem;
+}
+
+#snap-btn {
+  position: relative;
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 1.1rem 3rem 1.3rem;
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 1.6rem;
+  letter-spacing: 0.42em;
+  text-transform: uppercase;
+  color: #fffbe6;
+  background:
+    radial-gradient(circle at 50% 120%, rgba(255, 215, 0, 0.35), transparent 60%),
+    linear-gradient(135deg, #1a0a26 0%, #2a0033 50%, #1a0810 100%);
+  border: 2px solid var(--gold);
+  border-radius: 60px;
+  cursor: pointer;
+  text-shadow: 0 0 16px rgba(255, 215, 0, 0.5);
+  box-shadow:
+    0 0 50px rgba(212, 175, 55, 0.35),
+    inset 0 0 30px rgba(212, 175, 55, 0.18);
+  transition: transform .3s, box-shadow .3s, filter .3s;
+}
+#snap-btn:not(:disabled):hover {
+  transform: translateY(-3px) scale(1.04);
+  box-shadow:
+    0 0 80px rgba(255, 217, 107, 0.7),
+    inset 0 0 40px rgba(255, 217, 107, 0.28);
+  filter: brightness(1.15);
+}
+#snap-btn:not(:disabled):active { transform: translateY(0) scale(1); }
+#snap-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.4);
+}
+.snap-label {
+  position: relative;
+  z-index: 1;
+}
+
+.snap-stones {
+  display: inline-flex;
+  gap: 0.45rem;
+}
+.stone {
+  width: 11px; height: 11px;
+  border-radius: 50%;
+  display: inline-block;
+  filter: blur(0.3px);
+  box-shadow: 0 0 8px currentColor, inset 0 0 4px rgba(255,255,255,0.6);
+  animation: stoneGlow 3s ease-in-out infinite;
+}
+.stone.power   { background: var(--power);   color: var(--power); }
+.stone.space   { background: var(--space);   color: var(--space);   animation-delay: .4s; }
+.stone.reality { background: var(--reality); color: var(--reality); animation-delay: .8s; }
+.stone.soul    { background: var(--soul);    color: var(--soul);    animation-delay: 1.2s; }
+.stone.time    { background: var(--time);    color: var(--time);    animation-delay: 1.6s; }
+.stone.mind    { background: var(--mind);    color: var(--mind);    animation-delay: 2.0s; }
+@keyframes stoneGlow {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50%      { transform: scale(1.25); filter: brightness(1.6); }
+}
+
+/* ───────── Winner image frame ───────── */
+#winner-image-frame {
+  position: fixed;
+  left: 50%;
+  top: 64%;
+  transform: translate(-50%, -50%) scale(0.85);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  z-index: 55;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 1.2s ease-out, transform 1.2s cubic-bezier(.2,.9,.3,1.1);
+  cursor: pointer;
+}
+#winner-image-frame.show {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1);
+  pointer-events: auto;
+}
+#winner-image {
+  width: min(420px, 70vw);
+  max-height: 36vh;
+  object-fit: cover;
+  border-radius: 14px;
+  border: 2px solid rgba(212, 175, 55, 0.55);
+  box-shadow:
+    0 0 0 1px rgba(255, 217, 107, 0.15),
+    0 30px 80px rgba(0, 0, 0, 0.7),
+    0 0 90px rgba(212, 175, 55, 0.25);
+  filter: saturate(0.85) contrast(1.05);
+}
+.winner-hint {
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.34em;
+  text-transform: uppercase;
+  color: rgba(244, 238, 224, 0.55);
+  animation: hintPulse 2.2s ease-in-out infinite;
+}
+@keyframes hintPulse {
+  0%, 100% { opacity: 0.45; text-shadow: 0 0 8px rgba(255, 217, 107, 0.0); }
+  50%      { opacity: 0.95; text-shadow: 0 0 14px rgba(255, 217, 107, 0.45); }
+}
+
+.signature {
+  text-align: center;
+  margin: 1rem 0 2rem;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.7rem;
+  letter-spacing: 0.3em;
+  color: rgba(244, 238, 224, 0.25);
+  text-transform: uppercase;
+}
+
+/* ───────── GIF overlay ───────── */
+#gif-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.98) 100%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+  animation: overlayFade .4s ease-out;
+  backdrop-filter: blur(4px);
+}
+@keyframes overlayFade { from { opacity: 0; } to { opacity: 1; } }
+
+.gif-frame {
+  position: relative;
+  padding: 4px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--mind), var(--soul), var(--reality), var(--power), var(--space), var(--time));
+  background-size: 400% 400%;
+  animation: gauntletGlow 4s ease infinite;
+  box-shadow: 0 0 100px rgba(255, 215, 0, 0.45);
+}
+@keyframes gauntletGlow { 0%,100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+#snap-gif {
+  display: block;
+  max-width: min(80vw, 700px);
+  max-height: 75vh;
+  border-radius: 8px;
+}
+
+/* ───────── Green flash ───────── */
+#flash-overlay {
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(circle at center,
+    rgba(180, 255, 180, 1) 0%,
+    rgba(74, 222, 128, 0.95) 25%,
+    rgba(22, 163, 74, 0.7) 55%,
+    rgba(20, 83, 45, 0.2) 80%,
+    transparent 100%);
+  z-index: 300;
+  pointer-events: none;
+  mix-blend-mode: screen;
+}
+#flash-overlay.go { animation: greenFlash .85s cubic-bezier(.2,.8,.4,1) forwards; }
+@keyframes greenFlash {
+  0%   { opacity: 0; transform: scale(0.6); }
+  18%  { opacity: 1; transform: scale(1.1); }
+  60%  { opacity: 0.45; transform: scale(1.4); }
+  100% { opacity: 0; transform: scale(2.2); }
+}
+
+/* ───────── Particle canvas ───────── */
+#particle-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+/* ───────── Disintegrating chip mask ───────── */
+.name-chip.dissolving {
+  transition: opacity 1.1s ease-out, filter 1.1s ease-out;
+  opacity: 0;
+  filter: blur(2px) brightness(1.4);
+}
+
+/* ───────── Survivor reveal animation ───────── */
+.name-chip.flying {
+  position: fixed !important;
+  z-index: 60;
+  transition:
+    left 1.7s cubic-bezier(.2, .9, .25, 1.05),
+    top 1.7s cubic-bezier(.2, .9, .25, 1.05),
+    transform 1.7s cubic-bezier(.2, .9, .25, 1.05),
+    box-shadow 1.7s ease-out,
+    background 1.7s ease-out,
+    border 1.7s ease-out,
+    font-size 1.7s ease-out,
+    padding 1.7s ease-out;
+}
+.name-chip.survivor.clickable {
+  cursor: pointer;
+}
+.name-chip.survivor.clickable:hover {
+  filter: brightness(1.12);
+}
+
+/* ───────── Utility ───────── */
+.hidden { display: none !important; }
+
+/* ───────── Subtle interactive flourish on whole page during snap ───────── */
+body.snapping main {
+  animation: shake .4s ease-in-out 3;
+}
+@keyframes shake {
+  0%, 100% { transform: translate(0, 0); }
+  25% { transform: translate(-2px, 1px); }
+  50% { transform: translate(3px, -2px); }
+  75% { transform: translate(-1px, 2px); }
+}
+
+/* While the winner stage is up, dim/hide the editing UI so the survivor stands alone. */
+body.snapped .input-zone,
+body.snapped .counter,
+body.snapped .action-zone,
+body.snapped .signature,
+body.snapped .hero .subtitle {
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .8s ease-out;
+}
+body.snapped .hero .title {
+  opacity: 0.4;
+  transition: opacity 1s ease-out;
+}
+
+/* ───────── Mobile tweaks ───────── */
+@media (max-width: 600px) {
+  .hero { padding-top: 3rem; }
+  #snap-btn { padding: 1rem 2rem 1.2rem; font-size: 1.3rem; letter-spacing: 0.35em; }
+  .input-zone { flex-direction: column; }
+  #add-btn { padding: 0.9rem; }
+}

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>The Snap — Randomizer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=Orbitron:wght@500;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="cosmos" aria-hidden="true"></div>
+  <div class="nebula" aria-hidden="true"></div>
+
+  <header class="hero">
+    <h1 class="title">The Snap</h1>
+    <p class="subtitle">Half will turn to ash. The other half — inevitable.</p>
+  </header>
+
+  <main>
+    <section class="input-zone">
+      <textarea id="name-input" placeholder="Enter names, one per line&#10;&#10;Tony Stark&#10;Steve Rogers&#10;Natasha&#10;Bruce Banner" autocomplete="off" spellcheck="false"></textarea>
+      <div class="input-actions">
+        <button id="add-btn" type="button">Add to roster</button>
+        <button id="clear-all-btn" type="button" class="ghost">Clear all</button>
+      </div>
+    </section>
+
+    <section class="counter">
+      <span id="count">0</span><span class="counter-label">souls awaiting judgment</span>
+    </section>
+
+    <section id="names-grid" class="names-grid" aria-live="polite"></section>
+
+    <section class="action-zone">
+      <button id="snap-btn" type="button" disabled>
+        <span class="snap-stones" aria-hidden="true">
+          <i class="stone power"></i>
+          <i class="stone space"></i>
+          <i class="stone reality"></i>
+          <i class="stone soul"></i>
+          <i class="stone time"></i>
+          <i class="stone mind"></i>
+        </span>
+        <span class="snap-label">Snap</span>
+      </button>
+    </section>
+  </main>
+
+  <footer class="signature">a perfectly balanced randomizer · as all things should be</footer>
+
+  <div id="gif-overlay" class="hidden" aria-hidden="true">
+    <div class="gif-frame">
+      <img id="snap-gif" src="festthefestivefest-thor.gif" alt="" />
+    </div>
+  </div>
+
+  <div id="flash-overlay" class="hidden" aria-hidden="true"></div>
+
+  <div id="winner-image-frame" class="hidden">
+    <img id="winner-image" src="5cc9cb72e9f08a12fc746a47.webp" alt="The aftermath" />
+    <span class="winner-hint">click to restore reality</span>
+  </div>
+
+  <canvas id="particle-canvas" aria-hidden="true"></canvas>
+
+  <script src="script.js"></script>
+</body>
+</html>
