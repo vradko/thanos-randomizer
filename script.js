@@ -112,10 +112,18 @@ function addToRoster() {
     if (next.length >= 60) break; // sanity cap
   }
 
-  // TODO: gauntlet summon animation is temporarily disabled — needs debugging.
-  // To re-enable, restore the hasNewArrivals check + summonGauntlet() branch.
-  names = next;
-  render();
+  const prev = new Set(names.map(s => s.toLowerCase()));
+  const hasNewArrivals = next.some(n => !prev.has(n.toLowerCase()));
+
+  if (hasNewArrivals && !snapping) {
+    summonGauntlet(() => {
+      names = next;
+      render();
+    });
+  } else {
+    names = next;
+    render();
+  }
 }
 
 function clearAll() {
@@ -417,7 +425,7 @@ function computeSurvivorScale(rect) {
 // appearing on the climactic beat near the end.
 const SUMMON_TOTAL_MS    = 4800;
 const SUMMON_PEAK_MS     = 3400; // when chips render behind the overlay
-const SUMMON_WAVES_MS    = [0, 1500, 2900]; // lightning storm waves
+const SUMMON_WAVES_MS    = [0, 2000]; // lightning storm waves (lighter — was [0,1500,2900])
 
 function summonGauntlet(onPeak) {
   // Reset gif playback so it always starts from frame 0
@@ -438,6 +446,8 @@ function summonGauntlet(onPeak) {
 
 const SVG_NS = 'http://www.w3.org/2000/svg';
 
+let stormCounter = 0;
+
 function runLightningStorm() {
   const W = window.innerWidth;
   const H = window.innerHeight;
@@ -447,11 +457,30 @@ function runLightningStorm() {
   svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
   svg.setAttribute('preserveAspectRatio', 'none');
 
-  const N = 14;
+  // One SVG filter shared across all bolts in this wave — replaces a 4-deep
+  // CSS drop-shadow stack that previously ran per element.
+  const filterId = `bolt-glow-${++stormCounter}`;
+  const defs = document.createElementNS(SVG_NS, 'defs');
+  defs.innerHTML = `
+    <filter id="${filterId}" x="-15%" y="-15%" width="130%" height="130%">
+      <feGaussianBlur stdDeviation="2.4" result="b1"/>
+      <feMerge>
+        <feMergeNode in="b1"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  `;
+  svg.appendChild(defs);
+
+  const group = document.createElementNS(SVG_NS, 'g');
+  group.setAttribute('filter', `url(#${filterId})`);
+
+  const N = 8; // was 14 — fewer bolts is plenty once the shared filter handles glow
   for (let i = 0; i < N; i++) {
     const bolt = createLightningBolt(W, H, i, N);
-    svg.appendChild(bolt);
+    group.appendChild(bolt);
   }
+  svg.appendChild(group);
   document.body.appendChild(svg);
   setTimeout(() => svg.remove(), 1900);
 }
@@ -483,8 +512,8 @@ function createLightningBolt(W, H, index, total) {
   main.style.animationDelay = `${delay}ms`;
   g.appendChild(main);
 
-  // Optional branch off a midpoint
-  if (Math.random() < 0.55) {
+  // Optional branch off a midpoint (lower chance — keep the wave light)
+  if (Math.random() < 0.35) {
     const branchStart = Math.floor(segments * (0.35 + Math.random() * 0.4));
     const [bx0Str, by0Str] = points[branchStart].split(',');
     const bx0 = parseFloat(bx0Str);
