@@ -112,18 +112,10 @@ function addToRoster() {
     if (next.length >= 60) break; // sanity cap
   }
 
-  const prev = new Set(names.map(s => s.toLowerCase()));
-  const hasNewArrivals = next.some(n => !prev.has(n.toLowerCase()));
-
-  if (hasNewArrivals && !snapping) {
-    summonGauntlet(() => {
-      names = next;
-      render();
-    });
-  } else {
-    names = next;
-    render();
-  }
+  // TODO: gauntlet summon animation is temporarily disabled — needs debugging.
+  // To re-enable, restore the hasNewArrivals check + summonGauntlet() branch.
+  names = next;
+  render();
 }
 
 function clearAll() {
