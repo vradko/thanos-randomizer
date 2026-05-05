@@ -16,6 +16,12 @@ const addOverlay  = $('add-overlay');
 const gauntletGif = $('gauntlet-gif');
 const flashLayer  = $('flash-overlay');
 const winnerFrame = $('winner-image-frame');
+const restoreOverlay = $('restore-overlay');
+const restoreGif     = $('restore-gif');
+const announceOverlay = $('announce-overlay');
+const announceGif     = $('announce-gif');
+const clearOverlay    = $('clear-overlay');
+const clearGif        = $('clear-gif');
 const durationSlider = $('duration');
 const durationValue  = $('duration-value');
 const canvas      = $('particle-canvas');
@@ -126,10 +132,24 @@ function addToRoster() {
   }
 }
 
+const CLEAR_TOTAL_MS = 2100;
+
 function clearAll() {
-  // Clear only the active roster — leave the textarea (and its persisted copy) intact.
-  names = [];
-  render();
+  if (names.length === 0 || snapping) {
+    names = [];
+    render();
+    return;
+  }
+  const src = clearGif.getAttribute('src');
+  clearGif.setAttribute('src', '');
+  void clearGif.offsetWidth;
+  clearGif.setAttribute('src', src);
+  clearOverlay.classList.remove('hidden');
+  setTimeout(() => {
+    clearOverlay.classList.add('hidden');
+    names = [];
+    render();
+  }, CLEAR_TOTAL_MS);
 }
 
 addBtn.addEventListener('click', addToRoster);
@@ -200,6 +220,9 @@ async function startSnap() {
   await sleep(windowMs + 800);
   document.body.classList.remove('snapping');
 
+  // Announce gif before revealing the survivor
+  await playAnnounceGif();
+
   // Fade out the editing UI so the survivor stands alone on the cosmos.
   document.body.classList.add('snapped');
 
@@ -223,14 +246,43 @@ async function startSnap() {
   winnerFrame.addEventListener('click', restore);
 }
 
+const RESTORE_TOTAL_MS = 4200;
+const ANNOUNCE_TOTAL_MS = 1950;
+
+function playAnnounceGif() {
+  return new Promise(resolve => {
+    const src = announceGif.getAttribute('src');
+    announceGif.setAttribute('src', '');
+    void announceGif.offsetWidth;
+    announceGif.setAttribute('src', src);
+    announceOverlay.classList.remove('hidden');
+    setTimeout(() => {
+      announceOverlay.classList.add('hidden');
+      resolve();
+    }, ANNOUNCE_TOTAL_MS);
+  });
+}
+
 function resetAll() {
-  particles.length = 0;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Show restore reality gif
+  const src = restoreGif.getAttribute('src');
+  restoreGif.setAttribute('src', '');
+  void restoreGif.offsetWidth;
+  restoreGif.setAttribute('src', src);
+  restoreOverlay.classList.remove('hidden');
+
+  // Hide winner frame immediately
   winnerFrame.classList.remove('show');
   setTimeout(() => winnerFrame.classList.add('hidden'), 700);
-  document.body.classList.remove('snapping', 'snapped');
-  snapping = false;
-  render();
+
+  setTimeout(() => {
+    restoreOverlay.classList.add('hidden');
+    particles.length = 0;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    document.body.classList.remove('snapping', 'snapped');
+    snapping = false;
+    render();
+  }, RESTORE_TOTAL_MS);
 }
 
 /* ───────── Green flash ───────── */
@@ -423,12 +475,10 @@ function computeSurvivorScale(rect) {
 // thanos-last-stone.gif is ~5040ms long. We want the dramatic build-up to play out
 // across most of its runtime, with lightning sustained throughout, and the roster
 // appearing on the climactic beat near the end.
-const SUMMON_TOTAL_MS    = 4800;
-const SUMMON_PEAK_MS     = 3400; // when chips render behind the overlay
-const SUMMON_WAVES_MS    = [0, 2000]; // lightning storm waves (lighter — was [0,1500,2900])
+const SUMMON_TOTAL_MS    = 2200;
+const SUMMON_PEAK_MS     = 1500;
 
 function summonGauntlet(onPeak) {
-  // Reset gif playback so it always starts from frame 0
   const src = gauntletGif.getAttribute('src');
   gauntletGif.setAttribute('src', '');
   void gauntletGif.offsetWidth;
@@ -436,106 +486,8 @@ function summonGauntlet(onPeak) {
 
   addOverlay.classList.remove('hidden');
 
-  // Layered lightning storms across the full overlay window
-  SUMMON_WAVES_MS.forEach(t => setTimeout(runLightningStorm, t));
-
-  // Update the roster on the climactic beat
   setTimeout(() => { try { onPeak && onPeak(); } catch (_) {} }, SUMMON_PEAK_MS);
   setTimeout(() => addOverlay.classList.add('hidden'), SUMMON_TOTAL_MS);
-}
-
-const SVG_NS = 'http://www.w3.org/2000/svg';
-
-let stormCounter = 0;
-
-function runLightningStorm() {
-  const W = window.innerWidth;
-  const H = window.innerHeight;
-
-  const svg = document.createElementNS(SVG_NS, 'svg');
-  svg.setAttribute('class', 'lightning-storm');
-  svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
-  svg.setAttribute('preserveAspectRatio', 'none');
-
-  // One SVG filter shared across all bolts in this wave — replaces a 4-deep
-  // CSS drop-shadow stack that previously ran per element.
-  const filterId = `bolt-glow-${++stormCounter}`;
-  const defs = document.createElementNS(SVG_NS, 'defs');
-  defs.innerHTML = `
-    <filter id="${filterId}" x="-15%" y="-15%" width="130%" height="130%">
-      <feGaussianBlur stdDeviation="2.4" result="b1"/>
-      <feMerge>
-        <feMergeNode in="b1"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-  `;
-  svg.appendChild(defs);
-
-  const group = document.createElementNS(SVG_NS, 'g');
-  group.setAttribute('filter', `url(#${filterId})`);
-
-  const N = 8; // was 14 — fewer bolts is plenty once the shared filter handles glow
-  for (let i = 0; i < N; i++) {
-    const bolt = createLightningBolt(W, H, i, N);
-    group.appendChild(bolt);
-  }
-  svg.appendChild(group);
-  document.body.appendChild(svg);
-  setTimeout(() => svg.remove(), 1900);
-}
-
-function createLightningBolt(W, H, index, total) {
-  const g = document.createElementNS(SVG_NS, 'g');
-
-  const fromLeft = Math.random() < 0.5;
-  const startX = fromLeft ? -80 : W + 80;
-  const endX   = fromLeft ?  W + 80 : -80;
-  const startY = Math.random() * H;
-  const endY   = startY + (Math.random() - 0.5) * H * 0.55;
-
-  const segments = 22 + Math.floor(Math.random() * 10);
-  const points = [];
-  const dx = endX - startX;
-  const dy = endY - startY;
-  for (let s = 0; s <= segments; s++) {
-    const t = s / segments;
-    const x = startX + dx * t + (Math.random() - 0.5) * 28;
-    const y = startY + dy * t + (Math.random() - 0.5) * 80;
-    points.push(`${x.toFixed(1)},${y.toFixed(1)}`);
-  }
-
-  const main = document.createElementNS(SVG_NS, 'polyline');
-  main.setAttribute('points', points.join(' '));
-  main.setAttribute('class', index % 3 === 0 ? 'lightning-bolt thick' : 'lightning-bolt');
-  const delay = (index / total) * 650 + Math.random() * 220;
-  main.style.animationDelay = `${delay}ms`;
-  g.appendChild(main);
-
-  // Optional branch off a midpoint (lower chance — keep the wave light)
-  if (Math.random() < 0.35) {
-    const branchStart = Math.floor(segments * (0.35 + Math.random() * 0.4));
-    const [bx0Str, by0Str] = points[branchStart].split(',');
-    const bx0 = parseFloat(bx0Str);
-    const by0 = parseFloat(by0Str);
-    const branchPts = [`${bx0.toFixed(1)},${by0.toFixed(1)}`];
-    const bsteps = 6 + Math.floor(Math.random() * 5);
-    const dirX = (fromLeft ? 1 : -1) * (60 + Math.random() * 120);
-    const dirY = (Math.random() - 0.5) * 220;
-    for (let s = 1; s <= bsteps; s++) {
-      const t = s / bsteps;
-      const x = bx0 + dirX * t + (Math.random() - 0.5) * 22;
-      const y = by0 + dirY * t + (Math.random() - 0.5) * 28;
-      branchPts.push(`${x.toFixed(1)},${y.toFixed(1)}`);
-    }
-    const branch = document.createElementNS(SVG_NS, 'polyline');
-    branch.setAttribute('points', branchPts.join(' '));
-    branch.setAttribute('class', 'lightning-bolt');
-    branch.style.animationDelay = `${delay + 80}ms`;
-    g.appendChild(branch);
-  }
-
-  return g;
 }
 
 /* ───────── Initial render ───────── */

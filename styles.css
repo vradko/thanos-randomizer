@@ -540,7 +540,10 @@ input[type="range"]#duration::-moz-range-thumb {
 }
 
 /* ───────── Add / summon overlay (gauntlet) ───────── */
-#add-overlay {
+#add-overlay,
+#restore-overlay,
+#announce-overlay,
+#clear-overlay {
   position: fixed;
   inset: 0;
   display: flex;
@@ -587,7 +590,7 @@ input[type="range"]#duration::-moz-range-thumb {
   text-shadow:
     0 0 14px rgba(255, 215, 0, 0.75),
     0 0 32px rgba(212, 175, 55, 0.55);
-  animation: summonCaption 4.7s ease-out forwards;
+  animation: summonCaption 2.1s ease-out forwards;
 }
 
 @keyframes gauntletPop {
